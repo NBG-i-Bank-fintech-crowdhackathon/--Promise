@@ -1,0 +1,9 @@
+{
+  "name": "E-Prommise",
+  "version": "0.0.2",
+  "dependencies" : {
+    "express" : "*",
+    "body-parser" : "*",
+    "node-rsa" : "*"
+  }
+}
