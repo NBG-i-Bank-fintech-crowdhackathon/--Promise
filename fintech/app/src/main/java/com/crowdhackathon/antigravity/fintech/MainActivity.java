@@ -12,7 +12,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 
 import android.view.MotionEvent;
@@ -20,34 +19,13 @@ import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
-import android.widget.Adapter;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.ViewFlipper;
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.KeyPairGenerator;
-import java.security.SecureRandom;
-import java.security.Signature;
-import java.security.spec.RSAKeyGenParameterSpec;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.android.volley.*;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -56,10 +34,6 @@ import com.google.zxing.common.BitMatrix;
 public class MainActivity extends Activity {
 
     public static Context myContext;
-    private static final int KEY_SIZE = 1024;
-    private Map<String, String> TransactionData;
-    RequestQueue MyRequestQueue;
-
 
     private static int mYear;
     private static int mMonth;
@@ -90,7 +64,6 @@ public class MainActivity extends Activity {
 
         alert.setPositiveButton("Login", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
-                //What ever you want to do with the value
                 Editable YouEditTextValue = edittext.getText();
 
                 String h = edittext.getText().toString();
@@ -139,19 +112,8 @@ public class MainActivity extends Activity {
 
         mPickDate.setText("Pick Date");
 
-
-
-/*
-        MyRequestQueue = Volley.newRequestQueue(this);
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
-        KeyPair key = generate();
-*/
-       // sendToVerifyTest("gfh");
-       // System.out.println("pj"+key.getPublic());
-
     }
+
     private void setUpListeners(){
 
 
@@ -205,7 +167,6 @@ public class MainActivity extends Activity {
         });
 
         if (ammount!=null) {
-
             ammout.setText(ammount);
         }
 
@@ -242,10 +203,8 @@ public class MainActivity extends Activity {
                 setContentView(R.layout.main_page);
                 EditText edit = (EditText) findViewById(R.id.target_email);
                 Network.scannedCode = edit.getText().toString();
-                System.out.println("aha!");
                 setUpListeners();
                 pickRecep.setText(Network.scannedCode);
-
             }
         });
     }
@@ -292,6 +251,7 @@ public class MainActivity extends Activity {
         inFromRight.setInterpolator(new AccelerateInterpolator());
         return inFromRight;
     }
+
     private Animation outToLeftAnimation() {
         Animation outtoLeft = new TranslateAnimation(
                 Animation.RELATIVE_TO_PARENT,  0.0f, Animation.RELATIVE_TO_PARENT,  -1.0f,
@@ -301,6 +261,7 @@ public class MainActivity extends Activity {
         outtoLeft.setInterpolator(new AccelerateInterpolator());
         return outtoLeft;
     }
+
     private Animation inFromLeftAnimation() {
         Animation inFromLeft = new TranslateAnimation(
                 Animation.RELATIVE_TO_PARENT,  -1.0f, Animation.RELATIVE_TO_PARENT,  0.0f,
@@ -310,6 +271,7 @@ public class MainActivity extends Activity {
         inFromLeft.setInterpolator(new AccelerateInterpolator());
         return inFromLeft;
     }
+
     private Animation outToRightAnimation() {
         Animation outtoRight = new TranslateAnimation(
                 Animation.RELATIVE_TO_PARENT,  0.0f, Animation.RELATIVE_TO_PARENT,  +1.0f,
@@ -361,102 +323,6 @@ public class MainActivity extends Activity {
         return super.onTouchEvent(event);
     }
 
-
-    private void sendToVerifyTest(String data) {
-        KeyPair key = generate();
-        PrivateKey privateKey = key.getPrivate();
-        PublicKey publicKey = key.getPublic();
-        byte[] bytes = data.getBytes();
-
-        try {
-            byte[] answer=sign(bytes, privateKey);
-            String text = new String(bytes);
-            String text2 = new String(answer);
-            System.out.println(text);
-            System.out.println(text2);
-            Log.w("",publicKey.getFormat());
-            TransactionData = new HashMap<String, String>();
-            TransactionData.put("publicKey", publicKey.toString());
-            TransactionData.put("transactionMessage", text);
-            TransactionData.put("signature", text2);
-
-            String url = "http://192.168.43.174:8011/quote";
-            StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    //This code is executed if the server responds, whether or not the response contains data.
-                    //The String 'response' contains the server's response.
-                    Log.w("","xx"+response);
-                }
-            }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.w("","x3333x"+ error.getMessage());
-                }
-            }) {
-                protected Map<String, String> getParams() {
-
-                    return TransactionData;
-                }
-            };
-            MyRequestQueue.add(MyStringRequest);
-
-        } catch(Exception e) {
-
-        }
-
-    }
-
-    private byte[] sign(byte[] bytes, PrivateKey privateKey) throws Exception {
-        Signature signature = Signature.getInstance("SHA256withRSA", "SC");
-        signature.initSign(privateKey);
-        signature.update(bytes);
-        testNetwork();
-        return signature.sign();
-    }
-
-    private void testNetwork(){
-
-        System.out.println("sss");
-        String url = "http://192.168.43.174:8011/quote";
-        StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                //This code is executed if the server responds, whether or not the response contains data.
-                //The String 'response' contains the server's response.
-                Log.w("","xx"+response);
-            }
-        }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                System.out.println("x3333x"+ error.getMessage());
-            }
-        }) {
-            protected Map<String, String> getParams() {
-                Map<String, String> MyData = new HashMap<String, String>();
-                MyData.put("publicKey", "dfdf");
-                MyData.put("transactionMessage", "dd");
-                MyData.put("signature", "dfgfdg");//Add the data you'd like to send to the server.
-                System.out.println("32");
-                return MyData;
-            }
-        };
-        MyRequestQueue.add(MyStringRequest);
-    }
-
-    public static KeyPair generate() {
-        try {
-            SecureRandom random = new SecureRandom();
-            RSAKeyGenParameterSpec spec = new RSAKeyGenParameterSpec(KEY_SIZE, RSAKeyGenParameterSpec.F4);
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", "SC");
-            generator.initialize(spec, random);
-            return generator.generateKeyPair();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
     Bitmap encodeAsBitmap(String str) throws WriterException {
         BitMatrix result;
         try {
@@ -485,7 +351,6 @@ public class MainActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
 
         setContentView(R.layout.main_page);
-        System.out.println("aha!");
         setUpListeners();
         pickRecep.setText(Network.scannedCode);
     }

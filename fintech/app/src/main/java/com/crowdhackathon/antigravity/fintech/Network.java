@@ -24,7 +24,7 @@ import java.util.Map;
 public class Network {
 
 
-    private static String masterIp = "http://192.168.43.174:8011";
+    private static String masterIp = "http://10.0.2.2:8011";
     private static String temp_msg;
     private static String temp_signature;
     private static Map temp_map;
